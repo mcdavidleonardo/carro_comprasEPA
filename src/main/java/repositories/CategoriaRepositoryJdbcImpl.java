@@ -30,10 +30,12 @@ public class CategoriaRepositoryJdbcImpl implements Repository<Categoria>{
     public Categoria porId(Long idCategoria) throws SQLException {
         Categoria categoria = null;
         try(PreparedStatement stmt = conn.prepareStatement(
-                "select * from categorias where id_categoria = ?")) {
+                "select * from categorias where idcategoria = ?")) {
             stmt.setLong(1, idCategoria);
             try(ResultSet rs = stmt.executeQuery()) {
-                categoria = getCategoria(rs);
+                if(rs.next()) {
+                    categoria = getCategoria(rs);
+                }
             }
         }
         return categoria;
@@ -62,11 +64,16 @@ public class CategoriaRepositoryJdbcImpl implements Repository<Categoria>{
 
     }
 
+    @Override
+    public void actualizarStock(Long id) throws SQLException {
+
+    }
+
     private static Categoria getCategoria(ResultSet rs) throws SQLException {
         Categoria c = new Categoria();
         c.setNombre(rs.getString("nombre"));
         c.setEstado(rs.getInt("estado"));
-        c.setIdCategoria(rs.getLong("idCategoria"));
+        c.setIdCategoria(rs.getLong("idcategoria"));
         return c;
     }
 }

@@ -14,6 +14,7 @@ import service.ProductoServiceJdbcImpl;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.util.Optional;
 
 @WebServlet("/categorias/form")
 public class CategoriaFormControlador extends HttpServlet {
@@ -23,7 +24,20 @@ public class CategoriaFormControlador extends HttpServlet {
         //Obtener la conexion
         Connection conn = (Connection) req.getAttribute("conn");
         CategoriaService service = new CategoriaServiceJdbcImpl(conn);
-        req.setAttribute("categorias", service.listar());
+        long id;
+        try{
+            id = Long.parseLong(req.getParameter("idCategoria"));
+        }catch(NumberFormatException e){
+            id = 0L;
+        }
+        Categoria categoria = new Categoria();
+        if(id > 0){
+            Optional<Categoria> c = service.agregarPorId(id);
+            if(c.isPresent()){
+                categoria = c.get();
+            }
+        }
+        req.setAttribute("categoria", categoria);
         getServletContext().getRequestDispatcher("/formularioCategoria.jsp").forward(req, resp);
     }
 
@@ -38,7 +52,17 @@ public class CategoriaFormControlador extends HttpServlet {
         } catch (NumberFormatException e) {
             estado = 0;
         }
+
+        //Obtener el ID de Categoria
+        long idCategoria;
+        try{
+            idCategoria = Long.parseLong(req.getParameter("idCategoria"));
+        }catch (NumberFormatException e){
+            idCategoria = 0L;
+        }
+
         Categoria categoria = new Categoria();
+        categoria.setIdCategoria(idCategoria);
         categoria.setNombre(nombre);
         categoria.setEstado(estado);
         service.guardar(categoria);

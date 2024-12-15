@@ -35,6 +35,9 @@
                 <th>ID Categoría</th>
                 <th>Nombre</th>
                 <th>Estado</th>
+                <%if(username.isPresent()){%>
+                <th>Opciones</th>
+                <%}%>
             </tr>
             </thead>
             <tbody>
@@ -43,11 +46,17 @@
                 <td><%= c.getIdCategoria() %></td>
                 <td><%= c.getNombre() %></td>
                 <td><%= c.getEstado() %></td>
+                <%if(username.isPresent()){%>
+                <td><a href="<%=request.getContextPath()%>/categorias/form?idCategoria=<%=c.getIdCategoria()%>">Editar</a></td>
+                <%}%>
             </tr>
             <% } %>
             </tbody>
         </table>
     </div>
+</div>
+<div>
+    <p><a href="<%=request.getContextPath()%>/index.html">Ir al inicio </a></p>
 </div>
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

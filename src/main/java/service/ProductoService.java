@@ -13,6 +13,7 @@ public interface ProductoService {
     //Método Guardar, Eliminar y listar de categoria
     void guardar(Productos producto);
     void eliminar(Long id);
+    void actualizarStock(Long id);
     //Listar la categoria
     List<Categoria> listarCategorias();
     Optional<Categoria> porIdCategoria(Long idCategoria);

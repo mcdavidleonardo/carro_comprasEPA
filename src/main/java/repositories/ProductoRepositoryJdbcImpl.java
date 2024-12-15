@@ -26,7 +26,7 @@ public class ProductoRepositoryJdbcImpl implements Repository<Productos> {
         List<Productos> productos = new ArrayList<>();
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("select p.*, c.nombre as categoria from productos as p" +
-                     " inner join categorias as c on (p.idcategoria=c.idcategoria)")) {
+                     " inner join categorias as c on (p.idcategoria=c.idcategoria) order by p.idproducto")) {
             while (rs.next()) {
                 Productos p = getProductos(rs);
                 productos.add(p);
@@ -55,16 +55,17 @@ public class ProductoRepositoryJdbcImpl implements Repository<Productos> {
     public void guardar(Productos productos) throws SQLException {
         String sql;
         if(productos.getIdProducto() != null && productos.getIdProducto() > 0){
-            sql = "update productos set idcategoria = ?, nombre = ?, precio = ? where idproducto = ?";
+            sql = "update productos set idcategoria = ?, nombre = ?, precio = ?, stock = ? where idproducto = ?";
         }else{
-            sql = "insert into productos (idcategoria, nombre, precio) values (?, ?, ?)";
+            sql = "insert into productos (idcategoria, nombre, precio, stock) values (?, ?, ?, ?)";
         }
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, productos.getCategoria().getIdCategoria());
             stmt.setString(2, productos.getNombre());
             stmt.setDouble(3, productos.getPrecio());
+            stmt.setInt(4, productos.getStock());
             if(productos.getIdProducto() != null && productos.getIdProducto() > 0){
-                stmt.setLong(4, productos.getIdProducto());
+                stmt.setLong(5, productos.getIdProducto());
             }
             stmt.executeUpdate();
         }
@@ -79,11 +80,23 @@ public class ProductoRepositoryJdbcImpl implements Repository<Productos> {
         }
     }
 
+    @Override
+    public void actualizarStock(Long id) throws SQLException {
+        String sql;
+        sql = "update productos set stock = stock - 1 where idproducto = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        }
+    }
+
     private static Productos getProductos(ResultSet rs) throws SQLException {
         Productos p = new Productos();
         p.setIdProducto(rs.getLong("idproducto"));
         p.setNombre(rs.getString("nombre"));
         p.setPrecio(rs.getDouble("precio"));
+        p.setStock(rs.getInt("stock"));
         Categoria c = new Categoria();
         c.setIdCategoria(rs.getLong("idcategoria"));
         c.setNombre(rs.getString("categoria"));

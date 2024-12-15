@@ -7,6 +7,7 @@ import repositories.Repository;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 public class CategoriaServiceJdbcImpl implements CategoriaService {
     private Repository<Categoria> repositoryCategoriaJdbc;
@@ -29,6 +30,15 @@ public class CategoriaServiceJdbcImpl implements CategoriaService {
         try {
             repositoryCategoriaJdbc.guardar(categoria);
         } catch (SQLException throwables) {
+            throw new ServiceJdbcException(throwables.getMessage(), throwables.getCause());
+        }
+    }
+
+    @Override
+    public Optional<Categoria> agregarPorId(Long idCategoria) {
+        try{
+            return Optional.ofNullable(repositoryCategoriaJdbc.porId(idCategoria));
+        }catch(SQLException throwables){
             throw new ServiceJdbcException(throwables.getMessage(), throwables.getCause());
         }
     }
